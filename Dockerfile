@@ -1,11 +1,31 @@
-FROM python:3.10.11
+# Use an official Python runtime as a parent image
+FROM python:3.10-slim
 
-WORKDIR /root/Exon
+# Set environment variable to ensure Python outputs everything to the console
+ENV PYTHONUNBUFFERED 1
 
-COPY . .
+# Install system dependencies that may be required by some Python packages
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libssl-dev \
+    libffi-dev \
+    python3-dev \
+    libpq-dev \
+    && apt-get clean
 
-RUN pip3 install --upgrade pip setuptools
+# Set the working directory in the container
+WORKDIR /app
 
-RUN pip install -U -r requirements.txt
+# Copy the requirements file to the container
+COPY requirements.txt /app/
 
-CMD bash start
+# Upgrade pip and install dependencies from requirements.txt
+RUN pip install --upgrade pip setuptools wheel \
+    && pip install -U -r requirements.txt --no-cache-dir --verbose
+
+# Copy the rest of the application files to the container
+COPY . /app/
+
+# Command to run the application
+CMD ["bash", "start"]
+
