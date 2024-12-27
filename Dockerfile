@@ -1,31 +1,18 @@
-# Use an official Python runtime as a parent image
+# Use an official Python runtime as the base image
 FROM python:3.10-slim
 
-# Set environment variable to ensure Python outputs everything to the console
-ENV PYTHONUNBUFFERED 1
-
-# Install system dependencies that may be required by some Python packages
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libssl-dev \
-    libffi-dev \
-    python3-dev \
-    libpq-dev \
-    && apt-get clean
-
-# Set the working directory in the container
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy the requirements file to the container
-COPY requirements.txt /app/
+# Copy the current directory contents into the container
+COPY . /app
 
-# Upgrade pip and install dependencies from requirements.txt
-RUN pip install --upgrade pip setuptools wheel \
-    && pip install -U -r requirements.txt --no-cache-dir --verbose
+# Install dependencies from requirements.txt
+RUN pip install --upgrade pip setuptools wheel
+RUN pip install -r requirements.txt --no-cache-dir
 
-# Copy the rest of the application files to the container
-COPY . /app/
+# Expose port for web services (optional, for Flask/Django apps)
+EXPOSE 5000
 
-# Command to run the application
-CMD ["bash", "start"]
-
+# Run your application (change to your actual start command)
+CMD ["python", "your_app.py"]
